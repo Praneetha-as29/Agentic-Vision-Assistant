@@ -8,6 +8,9 @@ from google import genai
 from google.genai import types
 from detector import detect_objects
 from rag import SafetyKnowledgeBase
+from dotenv import load_dotenv
+
+load_dotenv()
 
 MODEL = "gemini-3.8-flash"
 MAX_TOOL_CALLS = 4
