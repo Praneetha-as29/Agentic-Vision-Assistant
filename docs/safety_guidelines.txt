@@ -1,0 +1,10 @@
+
+Traffic Safety Guidelines
+
+1. Identify visible road users and vehicles before assessing a traffic scene.
+2. A helmet may be visible on a motorcyclist, but image detection alone does not prove that the helmet meets safety standards.
+3. A vehicle or person detection is not sufficient evidence of a traffic violation.
+4. Seatbelt compliance should only be assessed when the seatbelt and relevant occupant are clearly visible.
+5. If an image is unclear or evidence is insufficient, report uncertainty instead of making a definite claim.
+6. Object detection confidence indicates the model's confidence in a detection, not the probability that a person is following traffic rules.
+7. Bounding-box coordinates describe the detected object's location in the image.
