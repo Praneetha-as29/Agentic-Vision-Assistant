@@ -12,7 +12,7 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-MODEL = "gemini-3.8-flash"
+MODEL = "gemini-3.5-flash-lite"
 MAX_TOOL_CALLS = 4
 
 client = genai.Client(api_key=os.environ.get("GEMINI_API_KEY"))

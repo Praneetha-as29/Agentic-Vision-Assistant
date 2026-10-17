@@ -1,5 +1,6 @@
 
 from pathlib import Path
+import re
 import faiss
 import numpy as np
 from sentence_transformers import SentenceTransformer
@@ -10,12 +11,22 @@ MODEL_NAME = "sentence-transformers/all-MiniLM-L6-v2"
 def load_documents():
     documents = []
 
-    for path in DOCS_DIR.glob("*.txt"):
+    for path in sorted(DOCS_DIR.glob("*.txt")):
         text = path.read_text(encoding="utf-8")
-        for paragraph in text.split("\n\n"):
-            paragraph = paragraph.strip()
-            if paragraph:
-                documents.append(paragraph)
+        numbered_items = re.findall(
+            r"(?m)^\s*\d+\.\s+(.+?)(?=^\s*\d+\.\s+|\Z)",
+            text,
+            flags=re.DOTALL
+        )
+
+        if numbered_items:
+            documents.extend(item.strip() for item in numbered_items)
+        else:
+            documents.extend(
+                paragraph.strip()
+                for paragraph in text.split("\n\n")
+                if paragraph.strip()
+            )
 
     if not documents:
         raise ValueError("No documents found in the docs folder.")
@@ -36,6 +47,9 @@ class SafetyKnowledgeBase:
         self.index.add(embeddings)
 
     def search(self, query, top_k=3):
+        if not query or not query.strip():
+            return []
+
         query_vector = self.model.encode(
             [query],
             convert_to_numpy=True,
