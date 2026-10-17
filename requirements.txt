@@ -10,3 +10,4 @@ python-dotenv
 pytest
 streamlit
 pillow
+gdown
