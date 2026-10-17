@@ -92,6 +92,12 @@ python -m venv .venv
 .\.venv\Scripts\Activate.ps1
 ```
 
+If PowerShell blocks script execution, use Command Prompt instead and activate the environment with:
+
+```bat
+.venv\Scripts\activate.bat
+```
+
 ### 3. Install dependencies
 
 ```powershell
@@ -100,7 +106,7 @@ python -m pip install -r requirements.txt
 
 ### 4. Configure the Gemini API key
 
-Create a file named `.env` in the project root:
+Create a file named `.env` in the project root and add your Gemini API key:
 
 ```text
 GEMINI_API_KEY=your_api_key_here
@@ -118,7 +124,7 @@ python -m streamlit run app.py
 
 Open the local URL printed in the terminal, normally `http://localhost:8501`.
 
-Upload a traffic image, enter a question, and select **Analyze traffic scene** to view the detections and generated assessment.
+Upload a traffic image, enter a question, and select **Analyze traffic scene** to view the object detections and generated safety assessment.
 
 ### 6. Run object detection independently
 
