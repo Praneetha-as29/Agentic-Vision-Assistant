@@ -14,7 +14,7 @@ An AI-powered traffic-scene analysis prototype combining a custom YOLO-based obj
 
 ![Traffic object detection dashboard](screenshots/dashboard.png)
 
-### Annotated Traffic Scene
+### Uploaded Traffic Scene
 
 ![Annotated traffic scene with object detection bounding boxes](screenshots/detection_metrics.png)
 
