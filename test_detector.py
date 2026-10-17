@@ -1,6 +1,7 @@
 
 import pytest
-from detector import detect_objects
+from pathlib import Path
+from detector import detect_objects, MODEL_PATH
 
 
 def test_missing_image_raises_error():
@@ -21,3 +22,24 @@ def test_detection_results_have_expected_fields():
         assert isinstance(detection["label"], str)
         assert isinstance(detection["confidence"], float)
         assert len(detection["bbox"]) == 4
+
+
+def test_configured_model_file_exists():
+    assert Path(MODEL_PATH).is_file()
+
+
+def test_detection_confidence_is_in_valid_range():
+    detections = detect_objects("test.jpg")
+
+    for detection in detections:
+        assert 0.0 <= detection["confidence"] <= 1.0
+
+
+def test_bounding_box_coordinates_are_numeric():
+    detections = detect_objects("test.jpg")
+
+    for detection in detections:
+        assert all(
+            isinstance(value, (int, float))
+            for value in detection["bbox"]
+        )

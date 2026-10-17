@@ -3,14 +3,24 @@ import sys
 from pathlib import Path
 from ultralytics import YOLO
 
-model = YOLO("yolov8n.pt")
+BASE_DIR = Path(__file__).resolve().parent
+MODEL_PATH = BASE_DIR / "models" / "india_vru_best.pt"
+CONFIDENCE_THRESHOLD = 0.35
+IOU_THRESHOLD = 0.45
+
+model = YOLO(str(MODEL_PATH))
 
 def detect_objects(image_path):
     path = Path(image_path)
     if not path.is_file():
         raise FileNotFoundError(f"Image not found: {image_path}")
 
-    results = model.predict(source=str(path), verbose=False)
+    results = model.predict(
+        source=str(path),
+        conf=CONFIDENCE_THRESHOLD,
+        iou=IOU_THRESHOLD,
+        verbose=False
+    )
     detections = []
 
     for result in results:

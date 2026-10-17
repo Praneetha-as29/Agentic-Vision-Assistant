@@ -21,3 +21,5 @@ evaluation/__pycache__/
 evaluation/**/labels.cache
 evaluation/coco_dataset/
 evaluation/coco_dataset_full.yaml
+models/
+test2.jpg

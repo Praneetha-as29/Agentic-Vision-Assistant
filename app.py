@@ -14,6 +14,8 @@ from detector import detect_objects
 
 load_dotenv()
 
+BASE_DIR = Path(__file__).resolve().parent
+
 st.set_page_config(
     page_title="Agentic Vision Assistant",
     page_icon="🔎",
@@ -22,7 +24,7 @@ st.set_page_config(
 
 st.title("Agentic Vision Assistant")
 st.caption(
-    "AI-assisted traffic-scene analysis using YOLOv8, "
+    "AI-assisted traffic-scene analysis using object detection, "
     "retrieval-augmented generation, and an AI agent."
 )
 
@@ -44,7 +46,9 @@ question = st.text_area(
     "Ask a question about the scene",
     value=(
         "Describe the visible traffic scene and identify potential "
-        "safety concerns. Distinguish observations from confirmed violations."
+        "safety concerns. Distinguish observations from confirmed violations. "
+        "Use the supplied detection results as evidence, avoid raw bounding-box "
+        "coordinates in the narrative, and acknowledge uncertainty."
     ),
     height=100
 )
@@ -68,10 +72,13 @@ if uploaded_file is not None:
                 delete=False,
                 suffix=suffix
             ) as temporary_file:
-                image.save(temporary_file, format="JPEG" if suffix in [".jpg", ".jpeg"] else "PNG")
+                image.save(
+                    temporary_file,
+                    format="JPEG" if suffix in [".jpg", ".jpeg"] else "PNG"
+                )
                 image_path = temporary_file.name
 
-            with st.spinner("Detecting objects with YOLOv8..."):
+            with st.spinner("Detecting objects with the Indian-road model..."):
                 detections = detect_objects(image_path)
 
             st.subheader("Detection dashboard")
@@ -82,34 +89,80 @@ if uploaded_file is not None:
 
                 for index, (label, count) in enumerate(sorted(counts.items())):
                     with columns[index % len(columns)]:
-                        st.metric(label=label.title(), value=count)
+                        st.metric(label=label.replace("_", " ").title(), value=count)
 
                 original = cv2.imread(image_path)
 
+                if original is None:
+                    raise ValueError("The uploaded image could not be read.")
+
+                image_height, image_width = original.shape[:2]
+
                 for item in detections:
                     x1, y1, x2, y2 = [
-                        int(value) for value in item["bbox"]
+                        int(round(value)) for value in item["bbox"]
                     ]
-                    label = f'{item["label"]} {item["confidence"]:.2f}'
+
+                    x1 = max(0, min(x1, image_width - 1))
+                    y1 = max(0, min(y1, image_height - 1))
+                    x2 = max(0, min(x2, image_width - 1))
+                    y2 = max(0, min(y2, image_height - 1))
+
+                    if x2 <= x1 or y2 <= y1:
+                        continue
+
+                    box_width = x2 - x1
+                    box_height = y2 - y1
 
                     cv2.rectangle(
                         original,
                         (x1, y1),
                         (x2, y2),
                         (0, 220, 100),
-                        2
+                        1
                     )
 
-                    cv2.putText(
-                        original,
-                        label,
-                        (x1, max(y1 - 8, 20)),
-                        cv2.FONT_HERSHEY_SIMPLEX,
-                        0.55,
-                        (0, 220, 100),
-                        2,
-                        cv2.LINE_AA
-                    )
+                    if box_width >= 55 and box_height >= 30:
+                        label = (
+                            f'{item["label"].replace("_", " ")} '
+                            f'{item["confidence"]:.2f}'
+                        )
+
+                        font_scale = 0.38
+                        thickness = 1
+
+                        (text_width, text_height), baseline = cv2.getTextSize(
+                            label,
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            font_scale,
+                            thickness
+                        )
+
+                        label_y = max(y1, text_height + baseline + 2)
+                        label_top = max(0, label_y - text_height - baseline - 4)
+                        label_right = min(
+                            image_width - 1,
+                            x1 + text_width + 6
+                        )
+
+                        cv2.rectangle(
+                            original,
+                            (x1, label_top),
+                            (label_right, label_y),
+                            (0, 150, 65),
+                            -1
+                        )
+
+                        cv2.putText(
+                            original,
+                            label,
+                            (x1 + 3, label_y - baseline - 1),
+                            cv2.FONT_HERSHEY_SIMPLEX,
+                            font_scale,
+                            (255, 255, 255),
+                            thickness,
+                            cv2.LINE_AA
+                        )
 
                 annotated = cv2.cvtColor(original, cv2.COLOR_BGR2RGB)
 
@@ -124,7 +177,7 @@ if uploaded_file is not None:
                     st.dataframe(
                         [
                             {
-                                "Object": item["label"],
+                                "Object": item["label"].replace("_", " ").title(),
                                 "Confidence": round(item["confidence"], 4),
                                 "Bounding box": str(item["bbox"])
                             }
@@ -134,11 +187,17 @@ if uploaded_file is not None:
                         hide_index=True
                     )
 
+                st.caption(
+                    f"Showing {len(detections)} detections. Small boxes retain "
+                    "their outlines; labels are hidden on very small boxes to "
+                    "reduce visual clutter. All detections remain in the table."
+                )
+
             else:
                 st.warning("No objects were detected in this image.")
 
             with st.spinner("Retrieving guidelines and generating the assessment..."):
-                answer = ask_agent(image_path, question.strip())
+                answer = ask_agent(image_path, question.strip(), detections)
 
             st.subheader("AI safety assessment")
             st.markdown(answer)
@@ -149,8 +208,10 @@ if uploaded_file is not None:
                     "the model. Confidence scores describe the model's "
                     "confidence in each object detection, not the probability "
                     "of a traffic violation. Bounding boxes show approximate "
-                    "object locations. Unclear images may not provide enough "
-                    "evidence to assess compliance with traffic rules."
+                    "object locations. Some labels are hidden on small boxes "
+                    "to improve readability, but the detections remain in the "
+                    "table. Unclear images may not provide enough evidence to "
+                    "assess compliance with traffic rules."
                 )
 
         except Exception as error:
