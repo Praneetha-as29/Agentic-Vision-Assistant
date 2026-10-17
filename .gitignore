@@ -19,3 +19,5 @@ outputs/
 Thumbs.db
 evaluation/__pycache__/
 evaluation/**/labels.cache
+evaluation/coco_dataset/
+evaluation/coco_dataset_full.yaml

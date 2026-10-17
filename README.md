@@ -106,7 +106,7 @@ Agentic-Vision-Assistant/
     └── results/
 ```
 
-The evaluation directory contains the pilot dataset, annotation files, evaluation scripts, and generated visualizations. Some intermediate files are used for the current experimental workflow.
+The `evaluation/` directory contains the pilot traffic images, manually prepared YOLO annotations, dataset-building and validation scripts, annotation previews, and evaluation visualizations. The COCO-compatible dataset is generated locally by `build_coco_dataset.py` and is excluded from version control because it can be recreated from the original images and labels.
 
 ## Getting Started
 
