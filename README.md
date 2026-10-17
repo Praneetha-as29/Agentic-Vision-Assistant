@@ -2,6 +2,21 @@
 
 An AI-powered traffic-scene analysis prototype combining YOLOv8 object detection, Retrieval-Augmented Generation (RAG), and Gemini-powered agentic tool calling.
 
+## Application Screenshots
+
+### Main Interface
+![Agentic Vision Assistant interface](screenshots/User_Interface.png)
+
+### Object Detection Dashboard
+![Traffic object detection dashboard](screenshots/dashboard.png)
+
+### Annotated Traffic Scene
+![Annotated traffic scene with YOLOv8 bounding boxes](screenshots/detection_metrics.png)
+
+### AI Safety Assessment
+![Evidence-aware AI traffic safety assessment](screenshots/safety_assessment.png)
+
+
 ## Overview
 
 Agentic Vision Assistant analyzes traffic images, identifies visible objects, retrieves relevant traffic-safety guidelines, and generates an evidence-aware scene assessment.
