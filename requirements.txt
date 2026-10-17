@@ -1,6 +1,6 @@
 
 ultralytics
-opencv-python
+opencv-python-headless
 numpy
 sentence-transformers
 faiss-cpu
