@@ -2,6 +2,8 @@
 
 An AI-powered traffic-scene analysis prototype combining a custom YOLO-based object detector, Retrieval-Augmented Generation (RAG), and Gemini-powered agentic tool calling to produce evidence-aware traffic safety assessments.
 
+**Live Demo:** https://agentic-vision-assistant.streamlit.app/
+
 ## Application Screenshots
 
 ### Main Interface
