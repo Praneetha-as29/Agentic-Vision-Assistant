@@ -17,3 +17,5 @@ outputs/
 .vscode/
 .DS_Store
 Thumbs.db
+evaluation/__pycache__/
+evaluation/**/labels.cache

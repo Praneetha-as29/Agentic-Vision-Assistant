@@ -1,0 +1,6 @@
+person
+car
+bus
+motorcycle
+truck
+auto_rickshaw
