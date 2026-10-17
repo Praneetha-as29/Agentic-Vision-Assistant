@@ -6,7 +6,7 @@ An AI-powered traffic-scene analysis prototype combining a custom YOLO-based obj
 
 ### Main Interface
 
-![Agentic Vision Assistant interface](screenshots/user_interface.png)
+![Agentic Vision Assistant interface](screenshots/User_Interface.png)
 
 ### Object Detection Dashboard
 
